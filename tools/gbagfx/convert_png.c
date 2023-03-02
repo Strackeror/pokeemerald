@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include <png.h>
+#include <libpng16/png.h>
 #include "global.h"
 #include "convert_png.h"
 #include "gfx.h"

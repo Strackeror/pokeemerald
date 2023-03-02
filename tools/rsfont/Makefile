@@ -2,7 +2,7 @@ CC ?= gcc
 
 CFLAGS = -Wall -Wextra -Werror -std=c11 -O2 -DPNG_SKIP_SETJMP_CHECK
 
-LIBS = -lpng -lz
+LIBS = -lpng16 -lz
 
 SRCS = main.c convert_png.c util.c font.c
 
