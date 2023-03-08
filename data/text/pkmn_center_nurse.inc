@@ -10,7 +10,6 @@ gText_IllTakeYourPkmn:: @ 8272768
     .string "for a few seconds.$"
 
 gText_RestoredPkmnToFullHealth:: @ 8272798
-    .string "Thank you for waiting.\p"
     .string "We've restored your Pokémon\n"
     .string "to full health.$"
 
