@@ -1,4 +1,5 @@
 #include "global.h"
+#include "constants/battle.h"
 #include "malloc.h"
 #include "battle.h"
 #include "pokemon.h"
@@ -2429,6 +2430,7 @@ void UpdateHealthboxAttribute(u8 healthboxSpriteId, struct Pokemon *mon, u8 elem
 
 #define B_EXPBAR_PIXELS 64
 #define B_HEALTHBAR_PIXELS 48
+#define B_HEALTHBAR_DROP_FRAMES 20
 
 s32 MoveBattleBar(u8 battlerId, u8 healthboxSpriteId, u8 whichBar, u8 unused)
 {
@@ -2436,11 +2438,19 @@ s32 MoveBattleBar(u8 battlerId, u8 healthboxSpriteId, u8 whichBar, u8 unused)
 
     if (whichBar == HEALTH_BAR) // health bar
     {
+        u16 perFrame = gBattleSpritesDataPtr->battleBars[battlerId].receivedValue / B_HEALTHBAR_DROP_FRAMES;
+        if (perFrame == 0) {
+            perFrame = 1;
+        }
+        if (gIsCriticalHit || gMoveResultFlags & MOVE_RESULT_SUPER_EFFECTIVE) {
+            perFrame *= 2;
+        }
         currentBarValue = CalcNewBarValue(gBattleSpritesDataPtr->battleBars[battlerId].maxValue,
-                    gBattleSpritesDataPtr->battleBars[battlerId].oldValue,
-                    gBattleSpritesDataPtr->battleBars[battlerId].receivedValue,
-                    &gBattleSpritesDataPtr->battleBars[battlerId].currValue,
-                    B_HEALTHBAR_PIXELS / 8, 1);
+            gBattleSpritesDataPtr->battleBars[battlerId].oldValue,
+            gBattleSpritesDataPtr->battleBars[battlerId].receivedValue,
+            &gBattleSpritesDataPtr->battleBars[battlerId].currValue,
+            B_HEALTHBAR_PIXELS / 8,
+            perFrame);
     }
     else // exp bar
     {
