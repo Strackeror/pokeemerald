@@ -5141,10 +5141,7 @@ static void HandleEndTurn_FinishBattle(void)
         sub_8186444();
         BeginFastPaletteFade(3);
         FadeOutMapMusic(5);
-        #if B_TRAINERS_KNOCK_OFF_ITEMS
-        if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
-            TryRestoreStolenItems();
-        #endif
+        TryRestoreItems();
         for (i = 0; i < PARTY_SIZE; i++)
         {
             UndoMegaEvolution(i);

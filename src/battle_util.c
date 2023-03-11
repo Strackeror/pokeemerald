@@ -7,6 +7,8 @@
 #include "battle_controllers.h"
 #include "battle_interface.h"
 #include "battle_setup.h"
+#include "constants/item.h"
+#include "constants/pokemon.h"
 #include "party_menu.h"
 #include "pokemon.h"
 #include "international_string_util.h"
@@ -9823,19 +9825,29 @@ void SortBattlersBySpeed(u8 *battlers, bool8 slowToFast)
     }
 }
 
-void TryRestoreStolenItems(void)
+void TryRestoreItems(void)
 {
     u32 i;
     u16 stolenItem = ITEM_NONE;
     
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (gBattleStruct->itemStolen[i].stolen)
-        {
-            stolenItem = gBattleStruct->itemStolen[i].originalItem;
-            if (stolenItem != ITEM_NONE && ItemId_GetPocket(stolenItem) != POCKET_BERRIES)
-                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &stolenItem);  // Restore stolen non-berry items
+        stolenItem = gBattleStruct->itemStolen[i].originalItem;
+        // Skip poke if it has an held item or didn't start with one
+        if (stolenItem == ITEM_NONE || GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM)) {
+            continue;
         }
+
+        // Restore berry, if we have one in the bag
+        if (ItemId_GetPocket(stolenItem) == POCKET_BERRIES) {
+            if (RemoveBagItem(stolenItem, 1)) {
+                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &stolenItem);
+            }
+            continue;
+        }
+
+        // Restore other items
+        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &stolenItem);
     }
 }
 
