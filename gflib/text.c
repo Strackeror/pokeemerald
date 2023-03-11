@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gba/io_reg.h"
 #include "battle.h"
 #include "main.h"
 #include "m4a.h"
@@ -188,7 +189,6 @@ bool16 AddTextPrinter(struct TextPrinterTemplate *printerTemplate, u8 speed, voi
     GenerateFontHalfRowLookupTable(printerTemplate->fgColor, printerTemplate->bgColor, printerTemplate->shadowColor);
     if (speed != TEXT_SPEED_FF && speed != 0)
     {
-        --gTempTextPrinter.textSpeed;
         gTextPrinters[printerTemplate->windowId] = gTempTextPrinter;
     }
     else
@@ -210,27 +210,36 @@ bool16 AddTextPrinter(struct TextPrinterTemplate *printerTemplate, u8 speed, voi
 
 void RunTextPrinters(void)
 {
-    int i;
-
+    int i,j;
     if (gDisableTextPrinters == 0)
     {
         for (i = 0; i < NUM_TEXT_PRINTERS; ++i)
         {
             if (gTextPrinters[i].active)
             {
-                u16 temp = RenderFont(&gTextPrinters[i]);
-                switch (temp)
-                {
-                case 0:
-                    CopyWindowToVram(gTextPrinters[i].printerTemplate.windowId, 2);
-                case 3:
-                    if (gTextPrinters[i].callback != 0)
-                        gTextPrinters[i].callback(&gTextPrinters[i].printerTemplate, temp);
-                    break;
-                case 1:
-                    gTextPrinters[i].active = 0;
-                    break;
+                u8 speed = gTextPrinters->textSpeed;
+                if (gTextFlags.canABSpeedUpPrint && JOY_NEW(A_BUTTON)) {
+                    speed = 48;
                 }
+                for (j = 0; j < speed; ++j)
+                {
+                    u16 temp = RenderFont(&gTextPrinters[i]);
+                    switch (temp)
+                    {
+                    case 0:
+                    case 3:
+                        if (gTextPrinters[i].callback != 0)
+                            gTextPrinters[i].callback(&gTextPrinters[i].printerTemplate, temp);
+                        break;
+                    case 1:
+                        gTextPrinters[i].active = 0;
+                        break;
+                    }
+                    if (temp == 3 || temp == 1) {
+                        break;
+                    }
+                }
+                CopyWindowToVram(gTextPrinters[i].printerTemplate.windowId, 2);
             }
         }
     }
@@ -860,7 +869,7 @@ u16 RenderText(struct TextPrinter *textPrinter)
         if (!(gBattleTypeFlags & BATTLE_TYPE_RECORDED) && gTextFlags.autoScroll)
             textPrinter->delayCounter = 3;
         else
-            textPrinter->delayCounter = textPrinter->textSpeed;
+            textPrinter->delayCounter = 0;
 
         currChar = *textPrinter->printerTemplate.currentChar;
         textPrinter->printerTemplate.currentChar++;
