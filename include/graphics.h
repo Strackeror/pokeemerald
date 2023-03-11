@@ -8613,6 +8613,7 @@ extern const u16 gBattleInterface_BallDisplayPal[];
 
 extern const u32 gBagSwapLineGfx[];
 extern const u32 gBagSwapLinePal[];
+extern const u32 gSwapLineGfx_RegisteredItemsMenu[];
 
 extern const u32 gBattleFrontierGfx_PyramidBag[];
 extern const u32 gBattleFrontierGfx_PyramidBag_Pal[];
