@@ -2375,3 +2375,18 @@ bool8 ScrCmd_isChosenMonSpecies(struct ScriptContext *ctx)
     }
     return FALSE;
 }
+
+bool8 ScrCmd_showitemdesc(struct ScriptContext *ctx)
+{
+    u16 item = VarGet(ScriptReadHalfword(ctx));
+    u16 quantity = VarGet(ScriptReadHalfword(ctx));
+    bool8 berry = ScriptReadByte(ctx);
+    DrawHeaderBox(item, quantity, berry);
+    return FALSE;
+}
+
+bool8 ScrCmd_hideitemdesc(struct ScriptContext *ctx)
+{
+    HideHeaderBox();
+    return FALSE;
+}

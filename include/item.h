@@ -76,5 +76,7 @@ u8 ItemId_GetBattleUsage(u16 itemId);
 ItemUseFunc ItemId_GetBattleFunc(u16 itemId);
 u8 ItemId_GetSecondaryId(u16 itemId);
 bool32 IsPinchBerryItemEffect(u16 holdEffect);
+void DrawHeaderBox(u16 item, u16 quantity, bool8 berry);
+void HideHeaderBox(void);
 
 #endif // GUARD_ITEM_H

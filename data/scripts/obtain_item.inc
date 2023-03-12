@@ -1,4 +1,6 @@
 Std_ObtainItem:: @ 8271AD3
+	copyvar VAR_0x8004, VAR_0x8000
+	copyvar VAR_0x8005, VAR_0x8001
 	additem VAR_0x8000, VAR_0x8001
 	copyvar VAR_0x8007, VAR_RESULT
 	call EventScript_ObtainItemMessage
@@ -83,8 +85,11 @@ EventScript_ObtainedItem:: @ 8271B95
 EventScript_ObtainedItemMessage:
 	message gText_ObtainedTheItem
 EventScript_ContinueObtainedItem:
+	delay 10
+	showdescription VAR_0x8004, VAR_0x8005, 0
 	waitfanfare
 	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
+	hideitemdesc
 	setvar VAR_RESULT, 1
 	return
 
@@ -153,6 +158,8 @@ EventScript_PickUpItem:: @ 8271C3A
 	call_if_eq EventScript_FoundTMHM
 	compare VAR_0x8008, 0
 	call_if_eq EventScript_FoundItem
+	delay 10
+	showdescription VAR_0x8004, VAR_0x8005, 0
 	waitfanfare
 	waitmessage
 	bufferitemnameplural 1, VAR_0x8004, VAR_0x8005
@@ -160,10 +167,12 @@ EventScript_PickUpItem:: @ 8271C3A
 	compare VAR_RESULT, 1
 	goto_if_eq EventScript_PutBattlePyramidItemInBag
 	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
+	hideitemdesc
 	return
 
 EventScript_PutBattlePyramidItemInBag:: @ 8271C86
 	msgbox gText_PlayerPutItemInBag, MSGBOX_DEFAULT
+	hideitemdesc
 	return
 
 EventScript_FoundTMHM:: @ 8271C8F
@@ -216,12 +225,15 @@ EventScript_FoundHiddenItem:: @ 8271D1F
 	goto EventScript_PutHiddenItemInPocket
 	end
 
-EventScript_PutHiddenItemInPocket:: @ 8271D2A
+EventScript_PutHiddenItemInPocket::
+	delay 10
+	showdescription VAR_0x8004, VAR_0x8005, 0
 	waitmessage
 	waitfanfare
 	bufferitemnameplural 1, VAR_0x8004, 1
 	copyvar VAR_0x8004, VAR_0x8008
 	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
+	hideitemdesc
 	special TryPutTreasureInvestigatorsOnAir
 	special SetHiddenItemFlag
 	releaseall
