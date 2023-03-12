@@ -217,7 +217,7 @@ void RunTextPrinters(void)
         {
             if (gTextPrinters[i].active)
             {
-                u8 speed = gTextPrinters->textSpeed;
+                u8 speed = gTextPrinters[i].textSpeed;
                 if (gTextFlags.canABSpeedUpPrint && JOY_NEW(A_BUTTON)) {
                     speed = 48;
                 }
