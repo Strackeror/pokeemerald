@@ -164,7 +164,7 @@ bool8 BeginNormalPaletteFade(u32 selectedPalettes, s8 delay, u8 startY, u8 targe
     }
     else
     {
-        gPaletteFade.deltaY = 2;
+        gPaletteFade.deltaY = 8;
 
         if (delay < 0)
         {
