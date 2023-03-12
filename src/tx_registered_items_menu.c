@@ -425,7 +425,7 @@ static void TxRegItemsMenu_DoItemSwap(u8 taskId, bool8 a)
 static void TxRegItemsMenu_StartScrollIndicator(void)
 {
     if (TxRegItemsMenuItemPageInfo.scrollIndicatorTaskId == TASK_NONE)
-        TxRegItemsMenuItemPageInfo.scrollIndicatorTaskId = AddScrollIndicatorArrowPairParameterized(SCROLL_ARROW_UP, 28, 110, 148, TxRegItemsMenuItemPageInfo.count - TxRegItemsMenuItemPageInfo.pageItems, TILE_TAG_INDICATOR_ARROWS, TAG_INDICATOR_ARROWS, &(TxRegItemsMenuItemPageInfo.itemsAbove)); //176, 12, 148 x, y1, y2
+        TxRegItemsMenuItemPageInfo.scrollIndicatorTaskId = AddScrollIndicatorArrowPairParameterized(SCROLL_ARROW_UP, 28, 100, 155, TxRegItemsMenuItemPageInfo.count - TxRegItemsMenuItemPageInfo.pageItems, TILE_TAG_INDICATOR_ARROWS, TAG_INDICATOR_ARROWS, &(TxRegItemsMenuItemPageInfo.itemsAbove)); //176, 12, 148 x, y1, y2
 }
 
 static void TxRegItemsMenu_UpdateSwapLinePos(u8 y)
