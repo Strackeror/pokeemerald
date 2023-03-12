@@ -2442,9 +2442,6 @@ s32 MoveBattleBar(u8 battlerId, u8 healthboxSpriteId, u8 whichBar, u8 unused)
         if (perFrame == 0) {
             perFrame = 1;
         }
-        if (gIsCriticalHit || gMoveResultFlags & MOVE_RESULT_SUPER_EFFECTIVE) {
-            perFrame *= 2;
-        }
         currentBarValue = CalcNewBarValue(gBattleSpritesDataPtr->battleBars[battlerId].maxValue,
             gBattleSpritesDataPtr->battleBars[battlerId].oldValue,
             gBattleSpritesDataPtr->battleBars[battlerId].receivedValue,
