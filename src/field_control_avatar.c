@@ -14,6 +14,7 @@
 #include "field_screen_effect.h"
 #include "field_specials.h"
 #include "fldeff_misc.h"
+#include "global.fieldmap.h"
 #include "item_menu.h"
 #include "link.h"
 #include "match_call.h"
@@ -71,6 +72,7 @@ static bool8 TryStartStepCountScript(u16);
 static void UpdateFriendshipStepCounter(void);
 static bool8 UpdatePoisonStepCounter(void);
 static bool8 EnableAutoRun(void);
+static bool8 SwapBike(void);
 
 void FieldClearPlayerInput(struct FieldInput *input)
 {
@@ -197,8 +199,16 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     }
     if (input->pressedSelectButton && UseRegisteredKeyItemOnField(0) == TRUE)
         return TRUE;
-    if (input->pressedRButton && EnableAutoRun())
-        return TRUE;
+    if (input->pressedRButton) {
+        if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
+        {
+            return SwapBike();
+        }
+        else
+        {
+            return EnableAutoRun();
+        }
+    }
     if (input->pressedListButton)
     {
         TxRegItemsMenu_OpenMenu();
@@ -1041,3 +1051,20 @@ static bool8 EnableAutoRun(void)
     return TRUE;
 }
 
+static bool8 SwapBike(void) {
+    if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_ACRO_BIKE)
+    {
+        gPlayerAvatar.flags -= PLAYER_AVATAR_FLAG_ACRO_BIKE;
+        gPlayerAvatar.flags += PLAYER_AVATAR_FLAG_MACH_BIKE;
+        SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_MACH_BIKE);
+        PlaySE(SE_BIKE_BELL);
+    }
+    else if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_MACH_BIKE)
+    {
+        gPlayerAvatar.flags -= PLAYER_AVATAR_FLAG_MACH_BIKE;
+        gPlayerAvatar.flags += PLAYER_AVATAR_FLAG_ACRO_BIKE;
+        SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_ACRO_BIKE);
+        PlaySE(SE_BIKE_HOP);
+    }
+    return FALSE;
+}
