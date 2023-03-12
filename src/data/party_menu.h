@@ -680,27 +680,28 @@ static const u16 sUnusedData[] =
 
 enum
 {
-    MENU_SUMMARY,
-    MENU_SWITCH,
-    MENU_CANCEL1,
-    MENU_ITEM,
-    MENU_GIVE,
-    MENU_TAKE_ITEM,
-    MENU_MOVE_ITEM,
-    MENU_MAIL,
-    MENU_TAKE_MAIL,
-    MENU_READ,
-    MENU_CANCEL2,
-    MENU_SHIFT,
-    MENU_SEND_OUT,
-    MENU_ENTER,
-    MENU_NO_ENTRY,
-    MENU_STORE,
-    MENU_REGISTER,
-    MENU_TRADE1,
-    MENU_TRADE2,
-    MENU_TOSS,
-    MENU_FIELD_MOVES,
+  MENU_SUMMARY,
+  MENU_SWITCH,
+  MENU_DEX,
+  MENU_CANCEL1,
+  MENU_ITEM,
+  MENU_GIVE,
+  MENU_TAKE_ITEM,
+  MENU_MOVE_ITEM,
+  MENU_MAIL,
+  MENU_TAKE_MAIL,
+  MENU_READ,
+  MENU_CANCEL2,
+  MENU_SHIFT,
+  MENU_SEND_OUT,
+  MENU_ENTER,
+  MENU_NO_ENTRY,
+  MENU_STORE,
+  MENU_REGISTER,
+  MENU_TRADE1,
+  MENU_TRADE2,
+  MENU_TOSS,
+  MENU_FIELD_MOVES,
 };
 
 enum
@@ -728,10 +729,10 @@ struct
 {
     const u8 *text;
     TaskFunc func;
-} static const sCursorOptions[] =
-{
+} static const sCursorOptions[] = {
     [MENU_SUMMARY] = {gText_Summary5, CursorCb_Summary},
     [MENU_SWITCH] = {gText_Switch2, CursorCb_Switch},
+    [MENU_DEX] = {gText_PartyDex, CursorCb_Dex},
     [MENU_CANCEL1] = {gText_Cancel2, CursorCb_Cancel1},
     [MENU_ITEM] = {gText_Item, CursorCb_Item},
     [MENU_GIVE] = {gMenuText_Give, CursorCb_Give},

@@ -1,3 +1,4 @@
+#include "constants/pokemon.h"
 #include "global.h"
 #include "malloc.h"
 #include "battle.h"
@@ -43,6 +44,7 @@
 #include "palette.h"
 #include "party_menu.h"
 #include "player_pc.h"
+#include "pokedex.h"
 #include "pokemon.h"
 #include "pokemon_icon.h"
 #include "pokemon_jump.h"
@@ -403,6 +405,7 @@ static void CursorCb_Trade1(u8);
 static void CursorCb_Trade2(u8);
 static void CursorCb_Toss(u8);
 static void CursorCb_FieldMove(u8);
+static void CursorCb_Dex(u8);
 static bool8 SetUpFieldMove_Surf(void);
 static bool8 SetUpFieldMove_Fly(void);
 static bool8 SetUpFieldMove_Waterfall(void);
@@ -2567,6 +2570,7 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
 
     sPartyMenuInternal->numActions = 0;
     AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
+    AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_DEX);
 
     // Let any Pokemon that learns Fly or Flash use it without knowing the move
     if (CanMonLearnTMHM(&mons[slotId], ITEM_HM02_FLY - ITEM_TM01_FOCUS_PUNCH))
@@ -2738,6 +2742,19 @@ static void Task_HandleSelectionMenuInput(u8 taskId)
             break;
         }
     }
+}
+
+static void CB2_ShowPokemonDexPage() {
+    
+    u16 species = SpeciesToNationalPokedexNum(GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_SPECIES2));
+    SetDexSelectedParty(species);
+    SetMainCallback2(CB2_OpenPokedex);
+}
+
+static void CursorCb_Dex(u8 taskId) {
+    PlaySE(SE_SELECT);
+    sPartyMenuInternal->exitCallback = CB2_ShowPokemonDexPage;
+    Task_ClosePartyMenu(taskId);
 }
 
 static void CursorCb_Summary(u8 taskId)

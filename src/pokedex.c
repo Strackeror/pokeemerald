@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle_main.h"
+#include "pokemon.h"
 #ifdef BATTLE_ENGINE
 #include "battle_util.h"
 #endif
@@ -126,9 +127,12 @@ enum
 #define POKEBALL_ROTATION_TOP    64
 #define POKEBALL_ROTATION_BOTTOM (POKEBALL_ROTATION_TOP - 16)
 
+#define SELECTED_PARTY_EXIT     0xFFFF
+
 // EWRAM
 static EWRAM_DATA struct PokedexView *sPokedexView = NULL;
 static EWRAM_DATA u16 sLastSelectedPokemon = 0;
+static EWRAM_DATA u16 sSelectedParty = 0;
 static EWRAM_DATA u8 sPokeBallRotation = 0;
 static EWRAM_DATA struct PokedexListItem *sPokedexListItem = NULL;
 //Pokedex Plus HGSS_Ui
@@ -1833,6 +1837,8 @@ static void ResetPokedexView(struct PokedexView *pokedexView)
         pokedexView->unkArr3[i] = 0;
 }
 
+
+
 void CB2_OpenPokedex(void)
 {
     switch (gMain.state)
@@ -1898,9 +1904,50 @@ static void CB2_Pokedex(void)
     UpdatePaletteFade();
 }
 
+void SetDexSelectedParty(u16 species) {
+    sSelectedParty = species;
+}
+
+static void Task_OpenQueuedSpecies(u8 taskId) {
+    u8 spriteId;
+    u16 species = sSelectedParty;
+    sSelectedParty = SELECTED_PARTY_EXIT;
+    spriteId = (u16)CreateMonSpriteFromNationalDexNumber(species, 48, 56, 0);
+    gSprites[spriteId].callback = SpriteCB_PokedexListMonSprite;
+    gTasks[taskId].data[0] =
+        LoadInfoScreen(&sPokedexView->pokedexList[sPokedexView->selectedPokemon], spriteId);
+    gTasks[taskId].func = Task_WaitForExitInfoScreen;
+    
+}
+
+static bool8 HandleQueuedSpecies(u8 taskId)
+{
+    u16 i, species;
+    u8 spriteId;
+    if (!sSelectedParty)
+        return FALSE;
+    if (sSelectedParty == SELECTED_PARTY_EXIT) {
+        gTasks[taskId].func = Task_ClosePokedex;
+        return TRUE;
+    }
+    species = sSelectedParty;
+    for (i = 0; i < sPokedexView->pokemonListCount; ++i)
+    {
+        if (sPokedexView->pokedexList[i].dexNum == species)
+        {
+            sPokedexView->selectedPokemon = i;
+            break;
+        }
+    }
+    gTasks[taskId].func = Task_OpenQueuedSpecies;
+    return TRUE;
+}
+
 void Task_OpenPokedexMainPage(u8 taskId)
 {
     sPokedexView->isSearchResults = FALSE;
+    if (HandleQueuedSpecies(taskId))
+        return;
     if (LoadPokedexListPage(PAGE_MAIN))
         gTasks[taskId].func = Task_HandlePokedexInput;
 }
@@ -2108,7 +2155,15 @@ static void Task_ClosePokedex(u8 taskId)
         ClearMonSprites();
         FreeWindowAndBgBuffers();
         DestroyTask(taskId);
-        SetMainCallback2(CB2_ReturnToFieldWithOpenMenu);
+        if (sSelectedParty)
+        {
+            sSelectedParty = 0;
+            SetMainCallback2(CB2_ReturnToPartyMenuFromFlyMap);
+        }
+        else
+        {
+            SetMainCallback2(CB2_ReturnToFieldWithOpenMenu);
+        }
         m4aMPlayVolumeControl(&gMPlayInfo_BGM, 0xFFFF, 0x100);
         Free(sPokedexView);
     }
@@ -2962,6 +3017,10 @@ static bool8 TryDoInfoScreenScroll(void)
 {
     u16 nextPokemon;
     u16 selectedPokemon = sPokedexView->selectedPokemon;
+
+    if (sSelectedParty) {
+        return FALSE;
+    }
 
     if ((JOY_NEW(DPAD_UP)) && selectedPokemon)
     {
