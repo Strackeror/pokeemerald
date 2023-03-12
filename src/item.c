@@ -42,7 +42,7 @@ EWRAM_DATA bool8 sShowHeaderBox = FALSE;
 #include "data/items.h"
 
 // code
-static u16 GetBagItemQuantity(u16 *quantity)
+u16 GetBagItemQuantity(u16 *quantity)
 {
     return gSaveBlock2Ptr->encryptionKey ^ *quantity;
 }
