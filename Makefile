@@ -416,8 +416,11 @@ $(OBJ_DIR)/sym_ewram.ld: sym_ewram.txt
 ifeq ($(MODERN),0)
 LD_SCRIPT := ld_script.txt
 LD_SCRIPT_DEPS := $(OBJ_DIR)/sym_bss.ld $(OBJ_DIR)/sym_common.ld $(OBJ_DIR)/sym_ewram.ld
-else
-LD_SCRIPT := ld_script_modern.txt
+	ifeq ($(DINFO),1)
+	LD_SCRIPT := ld_script_modern_debug.txt
+	else
+	LD_SCRIPT := ld_script_modern.txt
+	endif
 LD_SCRIPT_DEPS := 
 endif
 

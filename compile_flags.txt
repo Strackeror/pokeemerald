@@ -1,0 +1,9 @@
+-iquote
+include
+-iquote
+gflib
+-include
+include/global.h
+-D_MSC_VER
+-ferror-limit=0
+-Wno-deprecated-non-prototype
