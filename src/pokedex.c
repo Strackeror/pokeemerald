@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle_main.h"
+#include "field_specials.h"
 #include "pokemon.h"
 #ifdef BATTLE_ENGINE
 #include "battle_util.h"
@@ -6547,6 +6548,39 @@ static bool8 CalculateMoves(void)
 
     return TRUE;
 }
+
+
+const u8 gText_dexTutor[] = _("Tutor");
+const u8 gText_dexStone[] = _("Stone");
+const u8 gText_dexKnuckle[] = _("Knuckle");
+const u8 gText_dexDynamo[] = _("Dynamo");
+const u8 gText_dexHeat[] = _("Heat");
+const u8 gText_dexBalance[] = _("Balance");
+const u8 gText_dexFeather[] = _("Feather");
+const u8 gText_dexMind[] = _("Mind");
+
+static const u8* GetBadgeText(u8 id) {
+    switch (id)
+    {
+    case 1:
+        return gText_dexStone;
+    case 2:
+        return gText_dexKnuckle;
+    case 3:
+        return gText_dexDynamo;
+    case 4:
+        return gText_dexHeat;
+    case 5:
+        return gText_dexBalance;
+    case 6:
+        return gText_dexFeather;
+    case 7:
+        return gText_dexMind;
+    default:
+        return gText_dexTutor;
+    }
+}
+
 static void PrintStatsScreen_MoveNameAndInfo(u8 taskId)
 {
     u8 numEggMoves      = sPokedexView->numEggMoves;
@@ -6612,10 +6646,17 @@ static void PrintStatsScreen_MoveNameAndInfo(u8 taskId)
     }
     else if (selected < (numEggMoves + numLevelUpMoves + numTMHMMoves + numTutorMoves))
     {
+        u8 xCentered;
+        const u8* text;
+
         move = sStatsMovesTutor[sPokedexView->moveSelected - numEggMoves - numLevelUpMoves - numTMHMMoves];
+        text = GetBadgeText(GetBadgeIdFromMove(move));
+        xCentered = moves_x + 114 - (GetStringWidth(1, text, -1) / 2u);
+
         StringCopy(gStringVar3, gMoveNamesLong[move]);
         StringCopy(gStringVar4, gMoveDescriptionPointers[(move - 1)]);
-        PrintInfoScreenTextSmall(gText_ThreeDashes, moves_x + 113, moves_y + 9);
+
+        PrintInfoScreenTextSmall(text, xCentered, moves_y + 17);
         item = ITEM_TEACHY_TV;
     }
     else
@@ -6627,7 +6668,7 @@ static void PrintStatsScreen_MoveNameAndInfo(u8 taskId)
 
     //Move name and description
     StringCopyPadded(gStringVar3, gStringVar3, CHAR_SPACE, 20);
-    PrintInfoScreenTextSmall(gStringVar3, moves_x, moves_y + 17); //Name
+    PrintInfoScreenTextSmall(gStringVar3, moves_x, moves_y + 16); //Name
     if (gTasks[taskId].data[5] == 0)
         PrintInfoScreenTextSmall(gStringVar4, moves_x, moves_y + 34);
     else
@@ -6636,9 +6677,15 @@ static void PrintStatsScreen_MoveNameAndInfo(u8 taskId)
 
     //Egg/TM/Level/Tutor Item Icon
     gTasks[taskId].data[3] = AddItemIconSprite(ITEM_TAG, ITEM_TAG, item);
-    gSprites[gTasks[taskId].data[3]].x = 203;
-    gSprites[gTasks[taskId].data[3]].y = 39;
     gSprites[gTasks[taskId].data[3]].oam.priority = 0;
+    if (item == ITEM_TEACHY_TV) {
+        gSprites[gTasks[taskId].data[3]].x = 217;
+        gSprites[gTasks[taskId].data[3]].y = 32;
+    }
+    else {
+        gSprites[gTasks[taskId].data[3]].x = 203;
+        gSprites[gTasks[taskId].data[3]].y = 39;
+    }
 
     //Moves selected from move max
     ConvertIntToDecimalStringN(gStringVar1, (selected+1), STR_CONV_MODE_RIGHT_ALIGN, 3);

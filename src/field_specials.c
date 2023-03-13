@@ -3696,6 +3696,34 @@ void BufferBattleFrontierTutorMoveName(void)
     }
 }
 
+
+
+u8 GetBadgeIdFromMove(u16 moveId) {
+    u8 i;
+	for (i = 0; i < ARRAY_COUNT(sPokemonCenter_TutorMoves1); i++)
+		if (moveId == sPokemonCenter_TutorMoves1[i])
+			return 1;
+	for (i = 0; i < ARRAY_COUNT(sPokemonCenter_TutorMoves2); i++)
+		if (moveId == sPokemonCenter_TutorMoves2[i])
+			return 2;
+	for (i = 0; i < ARRAY_COUNT(sPokemonCenter_TutorMoves3); i++)
+		if (moveId == sPokemonCenter_TutorMoves3[i])
+			return 3;
+	for (i = 0; i < ARRAY_COUNT(sPokemonCenter_TutorMoves4); i++)
+		if (moveId == sPokemonCenter_TutorMoves4[i])
+			return 4;
+	for (i = 0; i < ARRAY_COUNT(sPokemonCenter_TutorMoves5); i++)
+		if (moveId == sPokemonCenter_TutorMoves5[i])
+			return 5;	
+	for (i = 0; i < ARRAY_COUNT(sPokemonCenter_TutorMoves6); i++)
+		if (moveId == sPokemonCenter_TutorMoves6[i])
+			return 6;
+	for (i = 0; i < ARRAY_COUNT(sPokemonCenter_TutorMoves7); i++)
+		if (moveId == sPokemonCenter_TutorMoves7[i])
+			return 7;
+    return 0;
+}
+
 static void ShowBattleFrontierTutorWindow(u8 menu, u16 selection)
 {
     static const struct WindowTemplate sBattleFrontierTutor_WindowTemplate = 
