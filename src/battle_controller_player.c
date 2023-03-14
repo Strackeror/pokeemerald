@@ -602,6 +602,7 @@ static void HandleInputChooseMove(void)
     if (gMain.newKeys & A_BUTTON)
     {
         PlaySE(SE_SELECT);
+        DestroyTypeInfoSprite();
         if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_CURSE)
         {
             if (moveInfo->monType1 != TYPE_GHOST && moveInfo->monType2 != TYPE_GHOST && moveInfo->monType3 != TYPE_GHOST)
@@ -697,6 +698,7 @@ static void HandleInputChooseMove(void)
     }
     else if (JOY_NEW(B_BUTTON) || gPlayerDpadHoldFrames > 59)
     {
+        DestroyTypeInfoSprite();
         PlaySE(SE_SELECT);
         gBattleStruct->mega.playerSelect = FALSE;
         BtlController_EmitTwoReturnValues(1, 10, 0xFFFF);
@@ -1671,16 +1673,12 @@ static void MoveSelectionDisplayPpNumber(void)
 
 static void MoveSelectionDisplayMoveType(void)
 {
-    u8 *txtPtr;
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleResources->bufferA[gActiveBattler][4]);
+    u8 type = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type;
+    u8 split = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].split;
 
-    txtPtr = StringCopy(gDisplayedStringBattle, gText_MoveInterfaceType);
-    *(txtPtr)++ = EXT_CTRL_CODE_BEGIN;
-    *(txtPtr)++ = EXT_CTRL_CODE_SIZE;
-    *(txtPtr)++ = 1;
-
-    StringCopy(txtPtr, gTypeNames[gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type]);
-    BattlePutTextOnWindow(gDisplayedStringBattle, 10);
+    CreateTypeInfoSprites(type, split);
+    BattlePutTextOnWindow(gText_EmptyString3, 10);
 }
 
 static void MoveSelectionCreateCursorAt(u8 cursorPosition, u8 arg1)
