@@ -42,9 +42,7 @@ MAKER_CODE  := 01
 REVISION    := 0
 MODERN      ?= 0
 
-ifeq (modern,$(MAKECMDGOALS))
-  MODERN := 1
-endif
+MODERN := 1
 
 # use arm-none-eabi-cpp for macOS
 # as macOS's default compiler is clang
@@ -416,11 +414,11 @@ $(OBJ_DIR)/sym_ewram.ld: sym_ewram.txt
 ifeq ($(MODERN),0)
 LD_SCRIPT := ld_script.txt
 LD_SCRIPT_DEPS := $(OBJ_DIR)/sym_bss.ld $(OBJ_DIR)/sym_common.ld $(OBJ_DIR)/sym_ewram.ld
-	ifeq ($(DINFO),1)
-	LD_SCRIPT := ld_script_modern_debug.txt
-	else
-	LD_SCRIPT := ld_script_modern.txt
-	endif
+else ifeq ($(DINFO),1)
+LD_SCRIPT := ld_script_modern_debug.txt
+LD_SCRIPT_DEPS :=
+else
+LD_SCRIPT := ld_script_modern.txt
 LD_SCRIPT_DEPS := 
 endif
 
