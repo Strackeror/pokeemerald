@@ -103,7 +103,13 @@ void TryRestoreLastUsedBall(void);
 void TryAddLastUsedBallItemSprites(void);
 void UpdateAbilityPopup(u8 battlerId);
 
-void CreateTypeInfoSprites(u8 moveType, u8 splitType);
-void DestroyTypeInfoSprite();
+void TypeInfoDisplaySprites();
+void TypeInfoDestroySprites();
+void TypeInfoUpdateDouble(bool8 active);
+
+void TryRestoreBattleInfoSystem_ButtonPrompt(void);
+void TryHideBattleInfoSystem_ButtonPrompt(void);
+bool8 HandleInputMoveInfo();
+void StepMoveTypeInfo();
 
 #endif // GUARD_BATTLE_INTERFACE_H

@@ -2111,7 +2111,7 @@ static const struct BattleWindowText sTextOnWindowsInfo_Normal[] =
     },
     { // 9 PP remaining
         .fillValue = PIXEL_FILL(0xE),
-        .fontId = 1,
+        .fontId = 7,
         .x = 2,
         .y = 1,
         .letterSpacing = 0,

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gba/io_reg.h"
 #include "battle.h"
 #include "battle_anim.h"
 #include "battle_arena.h"
@@ -382,6 +383,7 @@ static void HandleInputChooseTarget(void)
         else
             BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | (gMultiUsePlayerCursor << 8));
         EndBounceEffect(gMultiUsePlayerCursor, BOUNCE_HEALTHBOX);
+        TypeInfoDestroySprites();
         TryHideLastUsedBall();
         HideMegaTriggerSprite();
         PlayerBufferExecCompleted();
@@ -394,6 +396,7 @@ static void HandleInputChooseTarget(void)
         DoBounceEffect(gActiveBattler, BOUNCE_HEALTHBOX, 7, 1);
         DoBounceEffect(gActiveBattler, BOUNCE_MON, 7, 1);
         EndBounceEffect(gMultiUsePlayerCursor, BOUNCE_HEALTHBOX);
+        TypeInfoUpdateDouble(FALSE);
     }
     else if (JOY_NEW(DPAD_LEFT | DPAD_UP))
     {
@@ -443,6 +446,7 @@ static void HandleInputChooseTarget(void)
             } while (i == 0);
         }
         gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = SpriteCb_ShowAsMoveTarget;
+        TypeInfoUpdateDouble(TRUE);
     }
     else if (JOY_NEW(DPAD_RIGHT | DPAD_DOWN))
     {
@@ -493,6 +497,7 @@ static void HandleInputChooseTarget(void)
         }
 
         gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = SpriteCb_ShowAsMoveTarget;
+        TypeInfoUpdateDouble(TRUE);
     }
 }
 
@@ -537,6 +542,7 @@ static void HandleInputShowEntireFieldTargets(void)
             BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | RET_MEGA_EVOLUTION | (gMultiUsePlayerCursor << 8));
         else
             BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | (gMultiUsePlayerCursor << 8));
+        TypeInfoDestroySprites();
         HideMegaTriggerSprite();
         PlayerBufferExecCompleted();
     }
@@ -565,6 +571,7 @@ static void HandleInputShowTargets(void)
             BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | RET_MEGA_EVOLUTION | (gMultiUsePlayerCursor << 8));
         else
             BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | (gMultiUsePlayerCursor << 8));
+        TypeInfoDestroySprites();
         HideMegaTriggerSprite();
         TryHideLastUsedBall();
         PlayerBufferExecCompleted();
@@ -599,10 +606,17 @@ static void HandleInputChooseMove(void)
     else
         gPlayerDpadHoldFrames = 0;
 
+    switch (HandleInputMoveInfo()) {
+        case 1:
+            return;
+        case 2:
+            PlayerHandleChooseMove();
+            return;
+    }
+
     if (gMain.newKeys & A_BUTTON)
     {
         PlaySE(SE_SELECT);
-        DestroyTypeInfoSprite();
         if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_CURSE)
         {
             if (moveInfo->monType1 != TYPE_GHOST && moveInfo->monType2 != TYPE_GHOST && moveInfo->monType3 != TYPE_GHOST)
@@ -672,6 +686,7 @@ static void HandleInputChooseMove(void)
                 BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | RET_MEGA_EVOLUTION | (gMultiUsePlayerCursor << 8));
             else
                 BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | (gMultiUsePlayerCursor << 8));
+            TypeInfoDestroySprites();
             HideMegaTriggerSprite();
             TryHideLastUsedBall();
             PlayerBufferExecCompleted();
@@ -687,6 +702,7 @@ static void HandleInputChooseMove(void)
                 gMultiUsePlayerCursor = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
 
             gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = SpriteCb_ShowAsMoveTarget;
+            TypeInfoUpdateDouble(TRUE);
             break;
         case 2:
             gBattlerControllerFuncs[gActiveBattler] = HandleInputShowTargets;
@@ -698,10 +714,10 @@ static void HandleInputChooseMove(void)
     }
     else if (JOY_NEW(B_BUTTON) || gPlayerDpadHoldFrames > 59)
     {
-        DestroyTypeInfoSprite();
         PlaySE(SE_SELECT);
         gBattleStruct->mega.playerSelect = FALSE;
         BtlController_EmitTwoReturnValues(1, 10, 0xFFFF);
+        TypeInfoDestroySprites();
         HideMegaTriggerSprite();
         PlayerBufferExecCompleted();
     }
@@ -1673,12 +1689,7 @@ static void MoveSelectionDisplayPpNumber(void)
 
 static void MoveSelectionDisplayMoveType(void)
 {
-    struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleResources->bufferA[gActiveBattler][4]);
-    u8 type = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type;
-    u8 split = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].split;
-
-    CreateTypeInfoSprites(type, split);
-    BattlePutTextOnWindow(gText_EmptyString3, 10);
+    TypeInfoDisplaySprites();
 }
 
 static void MoveSelectionCreateCursorAt(u8 cursorPosition, u8 arg1)
