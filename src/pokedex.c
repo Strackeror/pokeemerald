@@ -1,4 +1,6 @@
 #include "global.h"
+#include "gba/defines.h"
+#include "gba/m4a_internal.h"
 #include "battle_main.h"
 #include "field_specials.h"
 #include "pokemon.h"
@@ -6581,6 +6583,81 @@ static const u8* GetBadgeText(u8 id) {
     }
 }
 
+
+#define TAG_MOVE_TUTOR_BADGE 30030
+
+
+static const u32 sTutorBadge_Gfx[] = INCBIN_U32("graphics/pokedex/badges.4bpp.lz");
+static const u16 sTutorBadge_Pal[]   = INCBIN_U16("graphics/pokedex/badges.gbapal");
+static const struct CompressedSpriteSheet sTutorBadge_CSpriteSheet = {
+    .data = sTutorBadge_Gfx,
+    .size = 16 * 16 * 8 / 2,
+    .tag = TAG_MOVE_TUTOR_BADGE
+};
+static const struct SpritePalette sTutorBadge_SpritePal= {
+    .data = sTutorBadge_Pal,
+    .tag = TAG_MOVE_TUTOR_BADGE
+};
+
+static const union AnimCmd sTutorBadge_Badge0[] = { ANIMCMD_FRAME(0, 0), ANIMCMD_END };
+static const union AnimCmd sTutorBadge_Badge1[] = { ANIMCMD_FRAME(4, 0), ANIMCMD_END };
+static const union AnimCmd sTutorBadge_Badge2[] = { ANIMCMD_FRAME(8, 0), ANIMCMD_END };
+static const union AnimCmd sTutorBadge_Badge3[] = { ANIMCMD_FRAME(12, 0), ANIMCMD_END };
+static const union AnimCmd sTutorBadge_Badge4[] = { ANIMCMD_FRAME(16, 0), ANIMCMD_END };
+static const union AnimCmd sTutorBadge_Badge5[] = { ANIMCMD_FRAME(20, 0), ANIMCMD_END };
+static const union AnimCmd sTutorBadge_Badge6[] = { ANIMCMD_FRAME(24, 0), ANIMCMD_END };
+static const union AnimCmd sTutorBadge_Badge7[] = { ANIMCMD_FRAME(28, 0), ANIMCMD_END };
+
+static const union AnimCmd *sTutorBadge_Anims[] = {
+    sTutorBadge_Badge0,
+    sTutorBadge_Badge1,
+    sTutorBadge_Badge2,
+    sTutorBadge_Badge3,
+    sTutorBadge_Badge4,
+    sTutorBadge_Badge5,
+    sTutorBadge_Badge6,
+    sTutorBadge_Badge7,
+};
+
+static const struct OamData sTutorBadge_OamData = {
+    .shape = SPRITE_SHAPE(16x16),
+    .size = SPRITE_SIZE(16x16),
+};
+static const struct SpriteTemplate sTutorBadge_SpriteTemplate = {
+    .tileTag = TAG_MOVE_TUTOR_BADGE,
+    .paletteTag = TAG_MOVE_TUTOR_BADGE,
+    .oam = &sTutorBadge_OamData,
+    .anims = sTutorBadge_Anims,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
+
+
+static EWRAM_DATA struct {
+    bool8 active: 1;
+    u8 id: 7;
+} sTutorBadgeSprite;
+
+static void TutorBadge_Update(u8 badgeId) {
+    if (!sTutorBadgeSprite.active) {
+        LoadCompressedSpriteSheet(&sTutorBadge_CSpriteSheet);
+        LoadSpritePalette(&sTutorBadge_SpritePal);
+        sTutorBadgeSprite.id = CreateSprite(&sTutorBadge_SpriteTemplate, 223, 35, 0);
+        sTutorBadgeSprite.active = TRUE;
+    }
+    StartSpriteAnim(&gSprites[sTutorBadgeSprite.id], badgeId);
+}
+
+static void TutorBadge_Close() {
+    if (sTutorBadgeSprite.active) {
+        FreeSpritePaletteByTag(TAG_MOVE_TUTOR_BADGE);
+        FreeSpriteTilesByTag(TAG_MOVE_TUTOR_BADGE);
+        DestroySprite(&gSprites[sTutorBadgeSprite.id]);
+        sTutorBadgeSprite.active = FALSE;
+    }
+}
+
 static void PrintStatsScreen_MoveNameAndInfo(u8 taskId)
 {
     u8 numEggMoves      = sPokedexView->numEggMoves;
@@ -6604,6 +6681,7 @@ static void PrintStatsScreen_MoveNameAndInfo(u8 taskId)
     //Contest
     u8 contest_i, contest_effectValue, contest_appeal, contest_jam;
 
+    u8 badge = 0;
     //Calculate and retrieve correct move from the arrays
     if (selected < numEggMoves)
     {
@@ -6646,17 +6724,16 @@ static void PrintStatsScreen_MoveNameAndInfo(u8 taskId)
     }
     else if (selected < (numEggMoves + numLevelUpMoves + numTMHMMoves + numTutorMoves))
     {
-        u8 xCentered;
         const u8* text;
 
         move = sStatsMovesTutor[sPokedexView->moveSelected - numEggMoves - numLevelUpMoves - numTMHMMoves];
-        text = GetBadgeText(GetBadgeIdFromMove(move));
-        xCentered = moves_x + 114 - (GetStringWidth(1, text, -1) / 2u);
 
         StringCopy(gStringVar3, gMoveNamesLong[move]);
         StringCopy(gStringVar4, gMoveDescriptionPointers[(move - 1)]);
 
-        PrintInfoScreenTextSmall(text, xCentered, moves_y + 17);
+        badge = GetBadgeIdFromMove(move);
+        if (badge == 0)
+            PrintInfoScreenTextSmall(gText_ThreeDashes, moves_x + 113, moves_y + 9);
         item = ITEM_TEACHY_TV;
     }
     else
@@ -6678,14 +6755,14 @@ static void PrintStatsScreen_MoveNameAndInfo(u8 taskId)
     //Egg/TM/Level/Tutor Item Icon
     gTasks[taskId].data[3] = AddItemIconSprite(ITEM_TAG, ITEM_TAG, item);
     gSprites[gTasks[taskId].data[3]].oam.priority = 0;
-    if (item == ITEM_TEACHY_TV) {
-        gSprites[gTasks[taskId].data[3]].x = 217;
-        gSprites[gTasks[taskId].data[3]].y = 32;
-    }
-    else {
-        gSprites[gTasks[taskId].data[3]].x = 203;
-        gSprites[gTasks[taskId].data[3]].y = 39;
-    }
+    gSprites[gTasks[taskId].data[3]].x = 203;
+    gSprites[gTasks[taskId].data[3]].y = 39;
+
+    //Tutor Badge Icon
+    if (badge)
+        TutorBadge_Update(badge - 1);
+    else
+        TutorBadge_Close();
 
     //Moves selected from move max
     ConvertIntToDecimalStringN(gStringVar1, (selected+1), STR_CONV_MODE_RIGHT_ALIGN, 3);
@@ -7344,6 +7421,7 @@ static void Task_ExitStatsScreen(u8 taskId)
 {
     if (!gPaletteFade.active)
     {
+        TutorBadge_Close();
         FreeSpriteTilesByTag(ITEM_TAG);                         //Destroy item icon
         FreeSpritePaletteByTag(ITEM_TAG);                       //Destroy item icon
         FreeSpriteOamMatrix(&gSprites[gTasks[taskId].data[3]]); //Destroy item icon

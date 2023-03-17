@@ -95,8 +95,10 @@ static const struct CompressedSpriteSheet sSpriteSheet_SplitIcons = {
     .size = 16 * 16 * 3 / 2,
     .tag = TAG_SPLIT_ICONS,
 };
-static const struct SpritePalette sSpritePal_SplitIcons = { .data = sSplitIcons_Pal,
-    .tag = TAG_SPLIT_ICONS };
+static const struct SpritePalette sSpritePal_SplitIcons = {
+    .data = sSplitIcons_Pal,
+    .tag = TAG_SPLIT_ICONS,
+};
 static const union AnimCmd sSpriteAnim_SplitIcon0[] = { ANIMCMD_FRAME(0, 0), ANIMCMD_END };
 static const union AnimCmd sSpriteAnim_SplitIcon1[] = { ANIMCMD_FRAME(4, 0), ANIMCMD_END };
 static const union AnimCmd sSpriteAnim_SplitIcon2[] = { ANIMCMD_FRAME(8, 0), ANIMCMD_END };
