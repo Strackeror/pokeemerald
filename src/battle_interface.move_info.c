@@ -250,7 +250,7 @@ static const struct WindowTemplate sDescriptionWindowTemplate = {
 };
 
 static const u8 sText_Power[] = _("Pow:");
-static const u8 sText_Accuracy[] = _("Ac:");
+static const u8 sText_Accuracy[] = _(" Ac:");
 static const u8 sText_ThreeDashes[] = _("---");
 void MoveSelectionDisplayMoveData(void)
 {

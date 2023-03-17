@@ -63,7 +63,7 @@ static void CreateTypeIconSprite(u8 moveType)
     {
         LoadCompressedPalette(gMoveTypes_Pal, 0x1d0, 0x60);
         LoadCompressedSpriteSheet(&sSpriteSheet_MoveTypes);
-        sTypeSprite.typeSprite = CreateSprite(&sSpriteTemplate_MoveTypes, 205, 145, 5);
+        sTypeSprite.typeSprite = CreateSprite(&sSpriteTemplate_MoveTypes, 203, 145, 5);
     }
     sprite = &gSprites[sTypeSprite.typeSprite];
     sprite->oam.priority = 0;
@@ -127,7 +127,7 @@ static void CreateMoveSplitSprite(u8 splitType)
     {
         LoadCompressedSpriteSheet(&sSpriteSheet_SplitIcons);
         LoadSpritePalette(&sSpritePal_SplitIcons);
-        sTypeSprite.splitSprite = CreateSprite(&sSpriteTemplate_SplitIcons, 228, 145, 5);
+        sTypeSprite.splitSprite = CreateSprite(&sSpriteTemplate_SplitIcons, 227, 145, 5);
     }
     sprite = &gSprites[sTypeSprite.splitSprite];
     StartSpriteAnim(sprite, splitType);
