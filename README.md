@@ -1,9 +1,29 @@
-# Inclement Emerald
+# (Less) Inclement Emerald
 
-This is a ROM hack of Pokémon Emerald built using the [**pokeemerald decompilation project**](https://github.com/pret/pokeemerald) and the [**RHH pokeemerald expansion**](https://github.com/rh-hideout/pokeemerald-expansion).
+This is a ROM hack of Pokémon Emerald built on [**Pokemon Inclement Emerald**](https://github.com/BuffelSaft/pokeemerald).
 
-For details, credits, and other projects used, see the hack's [**Poké Community thread**](https://www.pokecommunity.com/showthread.php?t=457039).
+It adds a bunch of Qol/Streamlining Features:
+  - Faster Text
+    - Fast is nearly instant, Slow is as fast as the old 'fast' option
+  - Faster Black Transitions
+  - Faster HP Bars
+  - 'Move Pokémon' as first option on PC
+  - Restore Held Items at end of combat, taking one from bag if it was a berry
+  - When on a bike, swap bike type with R-Button
+  - Show item icon when picking up an item, and its decription if it is the first time you pick it up
+  - Register key items to a menu on L-Button
+  - Sort bag items
+  - Access a pokemon's dex page from the party menu
+  - When applicable, show the necessary badge's icon for tutor moves in dex
+  - Show enemy trainer party in trainer battles
+  - Show more information about moves in battle interface
 
-## Contacts
+# Code notes
 
-You can join the hack's Discord server by clicking [**here**](https://discord.gg/ZQpuvD6NTs).
+This can only be built with the 'modern' toolchain.
+My own alterations to the code are free to be copied and used as long as you credit me
+
+# Credits for this fork's additions
+- **ghoulslash**: Bag Sorting, Registered Items Menu, Pickup Item Descriptions
+- **TheXaman**: Registered items menu, Move Info UI
+- **LOuroboros**: Bike Swapping
