@@ -9833,16 +9833,20 @@ void TryRestoreItems(void)
     for (i = 0; i < PARTY_SIZE; i++)
     {
         stolenItem = gBattleStruct->itemStolen[i].originalItem;
-        // Skip poke if it has an held item or didn't start with one
-        if (stolenItem == ITEM_NONE || GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM)) {
+        // Skip poke if it didn't start with an item
+        if (stolenItem == ITEM_NONE)
             continue;
-        }
+
+        // Skip poke if it still has an item and nothing has been stolen
+        if (GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) != ITEM_NONE &&
+            !gBattleStruct->itemStolen[i].stolen)
+            continue;
 
         // Restore berry, if we have one in the bag
-        if (ItemId_GetPocket(stolenItem) == POCKET_BERRIES) {
-            if (RemoveBagItem(stolenItem, 1)) {
+        if (ItemId_GetPocket(stolenItem) == POCKET_BERRIES)
+        {
+            if (RemoveBagItem(stolenItem, 1)) 
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &stolenItem);
-            }
             continue;
         }
 
