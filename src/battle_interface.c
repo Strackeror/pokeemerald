@@ -2438,10 +2438,14 @@ s32 MoveBattleBar(u8 battlerId, u8 healthboxSpriteId, u8 whichBar, u8 unused)
 
     if (whichBar == HEALTH_BAR) // health bar
     {
-        u16 perFrame = gBattleSpritesDataPtr->battleBars[battlerId].receivedValue / B_HEALTHBAR_DROP_FRAMES;
+        s16 perFrame = gBattleSpritesDataPtr->battleBars[battlerId].receivedValue / B_HEALTHBAR_DROP_FRAMES;
         if (perFrame == 0) {
             perFrame = 1;
         }
+        if (perFrame < 0) {
+            perFrame *= -1;
+        }
+
         currentBarValue = CalcNewBarValue(gBattleSpritesDataPtr->battleBars[battlerId].maxValue,
             gBattleSpritesDataPtr->battleBars[battlerId].oldValue,
             gBattleSpritesDataPtr->battleBars[battlerId].receivedValue,
