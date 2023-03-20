@@ -5,6 +5,7 @@ This is a ROM hack of Pokémon Emerald built on [**Pokemon Inclement Emerald**](
 It adds a bunch of Qol/Streamlining Features:
   - Faster Text
     - Fast is nearly instant, Slow is as fast as the old 'fast' option
+    - Holding A will make text pass and battle pauses quicker
   - Faster Black Transitions
   - Faster HP Bars
   - 'Move Pokémon' as first option on PC
@@ -27,3 +28,4 @@ My own alterations to the code are free to be copied and used as long as you cre
 - **ghoulslash**: Bag Sorting, Registered Items Menu, Pickup Item Descriptions
 - **TheXaman**: Registered items menu, Move Info UI
 - **LOuroboros**: Bike Swapping
+- **Ydarissep**: Showing enemy party, Tutor Badge in Dex
