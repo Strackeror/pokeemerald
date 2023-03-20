@@ -1,4 +1,5 @@
 #include "global.h"
+#include "gba/io_reg.h"
 #include "battle.h"
 #include "constants/battle_move_effects.h"
 #include "constants/battle_script_commands.h"
@@ -2607,6 +2608,9 @@ static void Cmd_waitmessage(void)
         else
         {
             u16 toWait = T2_READ_16(gBattlescriptCurrInstr + 1);
+            if (JOY_HELD(A_BUTTON | B_BUTTON)) {
+                toWait = 12;
+            }
             if (++gPauseCounterBattle >= toWait)
             {
                 gPauseCounterBattle = 0;

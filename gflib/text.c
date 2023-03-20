@@ -773,8 +773,14 @@ bool16 TextPrinterWaitWithDownArrow(struct TextPrinter *textPrinter)
     else
     {
         TextPrinterDrawDownArrow(textPrinter);
-        if (JOY_NEW(A_BUTTON | B_BUTTON))
+        bool8 canSkip = FALSE;
+        if (textPrinter->delayCounter > 0)
+            textPrinter->delayCounter--;
+        else
+            canSkip = TRUE;
+        if (JOY_NEW(A_BUTTON | B_BUTTON) || (canSkip && JOY_HELD(A_BUTTON | B_BUTTON)))
         {
+            textPrinter->delayCounter = 0;
             result = TRUE;
             PlaySE(SE_SELECT);
         }
@@ -791,8 +797,14 @@ bool16 TextPrinterWait(struct TextPrinter *textPrinter)
     }
     else
     {
-        if (JOY_NEW(A_BUTTON | B_BUTTON))
+        bool8 canSkip = FALSE;
+        if (textPrinter->delayCounter > 0)
+            textPrinter->delayCounter--;
+        else
+            canSkip = TRUE;
+        if (JOY_NEW(A_BUTTON | B_BUTTON) || (canSkip && JOY_HELD(A_BUTTON | B_BUTTON)))
         {
+            textPrinter->delayCounter = 0;
             result = TRUE;
             PlaySE(SE_SELECT);
         }
@@ -928,6 +940,7 @@ u16 RenderText(struct TextPrinter *textPrinter)
                 return 2;
             case EXT_CTRL_CODE_PAUSE_UNTIL_PRESS:
                 textPrinter->state = 1;
+                textPrinter->delayCounter = 16;
                 if (gTextFlags.autoScroll)
                     subStruct->autoScrollDelay = 0;
                 return 3;
@@ -1012,6 +1025,7 @@ u16 RenderText(struct TextPrinter *textPrinter)
             break;
         case CHAR_PROMPT_CLEAR:
             textPrinter->state = 2;
+            textPrinter->delayCounter = 16;
             TextPrinterInitDownArrowCounters(textPrinter);
             return 3;
         case CHAR_PROMPT_SCROLL:
