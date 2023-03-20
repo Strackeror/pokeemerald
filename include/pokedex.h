@@ -42,6 +42,6 @@ bool16 HasAllHoennMons(void);
 void ResetPokedexScrollPositions(void);
 bool16 HasAllMons(void);
 void CB2_OpenPokedex(void);
-void SetDexSelectedParty(u16 species);
+void DexQueueShowPartyPage(u16 species);
 
 #endif // GUARD_POKEDEX_H

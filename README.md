@@ -15,6 +15,7 @@ It adds a bunch of Qol/Streamlining Features:
   - Register key items to a menu on L-Button
   - Sort bag items
   - Access a pokemon's dex page from the party menu
+  - When capturing a new pokémon, focus it the next time you open the pokédex
   - When applicable, show the necessary badge's icon for tutor moves in dex
   - Show enemy trainer party in trainer battles
   - Show more information about moves in battle interface

@@ -132,10 +132,17 @@ enum
 
 #define SELECTED_PARTY_EXIT     0xFFFF
 
+enum ShowOnlyPage {
+    NO,
+    SHOW,
+    EXIT
+};
+
 // EWRAM
 static EWRAM_DATA struct PokedexView *sPokedexView = NULL;
 static EWRAM_DATA u16 sLastSelectedPokemon = 0;
-static EWRAM_DATA u16 sSelectedParty = 0;
+static EWRAM_DATA u16 sSelectedPokemon = 0;
+static EWRAM_DATA enum ShowOnlyPage sShowSelectedPage = NO;
 static EWRAM_DATA u8 sPokeBallRotation = 0;
 static EWRAM_DATA struct PokedexListItem *sPokedexListItem = NULL;
 //Pokedex Plus HGSS_Ui
@@ -1907,14 +1914,15 @@ static void CB2_Pokedex(void)
     UpdatePaletteFade();
 }
 
-void SetDexSelectedParty(u16 species) {
-    sSelectedParty = species;
+void DexQueueShowPartyPage(u16 species) {
+    sSelectedPokemon = species;
+    sShowSelectedPage = SHOW;
 }
 
 static void Task_OpenQueuedSpecies(u8 taskId) {
     u8 spriteId;
-    u16 species = sSelectedParty;
-    sSelectedParty = SELECTED_PARTY_EXIT;
+    u16 species = sPokedexView->pokedexList[sPokedexView->selectedPokemon].dexNum;
+    sShowSelectedPage = EXIT;
     spriteId = (u16)CreateMonSpriteFromNationalDexNumber(species, 48, 56, 0);
     gSprites[spriteId].callback = SpriteCB_PokedexListMonSprite;
     gTasks[taskId].data[0] =
@@ -1927,20 +1935,27 @@ static bool8 HandleQueuedSpecies(u8 taskId)
 {
     u16 i, species;
     u8 spriteId;
-    if (!sSelectedParty)
+
+    if (sSelectedPokemon)
+    {
+        species = sSelectedPokemon;
+        for (i = 0; i < sPokedexView->pokemonListCount; ++i)
+        {
+            if (sPokedexView->pokedexList[i].dexNum == species)
+            {
+                sPokedexView->selectedPokemon = i;
+                sLastSelectedPokemon = i;
+                break;
+            }
+        }
+        sSelectedPokemon = 0;
+    }
+
+    if (sShowSelectedPage == NO)
         return FALSE;
-    if (sSelectedParty == SELECTED_PARTY_EXIT) {
+    if (sShowSelectedPage == EXIT) {
         gTasks[taskId].func = Task_ClosePokedex;
         return TRUE;
-    }
-    species = sSelectedParty;
-    for (i = 0; i < sPokedexView->pokemonListCount; ++i)
-    {
-        if (sPokedexView->pokedexList[i].dexNum == species)
-        {
-            sPokedexView->selectedPokemon = i;
-            break;
-        }
     }
     gTasks[taskId].func = Task_OpenQueuedSpecies;
     return TRUE;
@@ -2158,9 +2173,9 @@ static void Task_ClosePokedex(u8 taskId)
         ClearMonSprites();
         FreeWindowAndBgBuffers();
         DestroyTask(taskId);
-        if (sSelectedParty)
+        if (sShowSelectedPage == EXIT)
         {
-            sSelectedParty = 0;
+            sShowSelectedPage = 0;
             SetMainCallback2(CB2_ReturnToPartyMenuFromFlyMap);
         }
         else
@@ -3021,7 +3036,7 @@ static bool8 TryDoInfoScreenScroll(void)
     u16 nextPokemon;
     u16 selectedPokemon = sPokedexView->selectedPokemon;
 
-    if (sSelectedParty) {
+    if (sShowSelectedPage != NO) {
         return FALSE;
     }
 
@@ -4338,8 +4353,8 @@ static void HighlightSubmenuScreenSelectBarItem(u8 a, u16 b)
 
 u8 DisplayCaughtMonDexPage(u16 dexNum, u32 otId, u32 personality)
 {
+    sSelectedPokemon = dexNum;
     u8 taskId = CreateTask(Task_DisplayCaughtMonDexPage, 0);
-
     gTasks[taskId].tState = 0;
     gTasks[taskId].tDexNum = dexNum;
     gTasks[taskId].tOtIdLo = otId;

@@ -2747,7 +2747,7 @@ static void Task_HandleSelectionMenuInput(u8 taskId)
 static void CB2_ShowPokemonDexPage() {
     
     u16 species = SpeciesToNationalPokedexNum(GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_SPECIES2));
-    SetDexSelectedParty(species);
+    DexQueueShowPartyPage(species);
     SetMainCallback2(CB2_OpenPokedex);
 }
 
