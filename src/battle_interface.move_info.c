@@ -20,6 +20,7 @@ EWRAM_DATA struct {
     bool8 loaded: 1;
     bool8 active: 1;
     u8 buttonPromptSprites[2];
+    u8 window;
 } sBattleMenuState;
 
 
@@ -278,7 +279,10 @@ void MoveSelectionDisplayMoveData(void)
     BattlePutTextOnWindow(gDisplayedStringBattle, 9);
 
     // Description
-    u8 window = AddWindow(&sDescriptionWindowTemplate);
+    if (!sBattleMenuState.active) {
+        sBattleMenuState.window = AddWindow(&sDescriptionWindowTemplate);
+    }
+    u8 window = sBattleMenuState.window;
     struct TextPrinterTemplate descriptionTemplate = {
         .currentChar = gMoveDescriptionPointers[move - 1],
         .windowId = window,
@@ -297,7 +301,6 @@ void MoveSelectionDisplayMoveData(void)
     AddTextPrinter(&descriptionTemplate, 0, NULL);
     CopyWindowToVram(window, 3);
     PutWindowTilemap(window);
-    RemoveWindow(window);
 }
 
 enum
@@ -315,6 +318,7 @@ u8 HandleInputMoveInfo()
         {
             sBattleMenuState.active = FALSE;
             TryRestoreBattleInfoSystem_ButtonPrompt();
+            RemoveWindow(sBattleMenuState.window);
             return REFRESH;
         }
     }
@@ -323,9 +327,9 @@ u8 HandleInputMoveInfo()
         TryRestoreBattleInfoSystem_ButtonPrompt();
         if (JOY_NEW(A_BUTTON) && JOY_HELD(L_BUTTON))
         {
-            sBattleMenuState.active = TRUE;
             MoveSelectionDisplayMoveData();
             TryHideBattleInfoSystem_ButtonPrompt();
+            sBattleMenuState.active = TRUE;
         }
         if (JOY_NEW(A_BUTTON | B_BUTTON))
         {
