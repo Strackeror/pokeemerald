@@ -1351,8 +1351,7 @@ static void Task_GiveExpToMon(u8 taskId)
         gActiveBattler = battlerId;
         BtlController_EmitTwoReturnValues(1, RET_VALUE_LEVELED_UP, gainedExp);
         gActiveBattler = savedActiveBattler;
-        if (IsDoubleBattle() == TRUE
-         && ((u16)(monId) == gBattlerPartyIndexes[battlerId] || (u16)(monId) == gBattlerPartyIndexes[battlerId ^ BIT_FLANK]))
+        if ((u16)(monId) == gBattlerPartyIndexes[battlerId] || (IsDoubleBattle() == TRUE && (u16)(monId) == gBattlerPartyIndexes[battlerId ^ BIT_FLANK]))
             gTasks[taskId].func = Task_LaunchLvlUpAnim;
         else
             gTasks[taskId].func = DestroyExpTaskAndCompleteOnInactiveTextPrinter;
