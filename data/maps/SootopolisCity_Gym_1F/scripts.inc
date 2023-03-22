@@ -203,6 +203,7 @@ SootopolisCity_Gym_1F_EventScript_GymGuide:: @ 8225040
 	lock
 	faceplayer
 	goto_if_set FLAG_DEFEATED_SOOTOPOLIS_GYM, SootopolisCity_Gym_1F_EventScript_GymGuidePostVictory
+	callnative SyncSoftLevelCap
 	msgbox SootopolisCity_Gym_1F_Text_GymGuideAdvice, MSGBOX_DEFAULT
 	release
 	end

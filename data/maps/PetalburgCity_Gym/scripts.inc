@@ -1268,6 +1268,7 @@ PetalburgCity_Gym_EventScript_GymGuide:: @ 820574F
 	goto_if_set FLAG_PETALBURG_GYM_CHILAN_BERRIES, PetalburgCity_Gym_EventScript_GymGuide2
 	msgbox PetalburgCity_Gym_Text_GymGuideAdvice1, MSGBOX_DEFAULT
 	giveitem ITEM_CHILAN_BERRY, 15
+	callnative SyncSoftLevelCap
 	setflag FLAG_PETALBURG_GYM_CHILAN_BERRIES
 	msgbox PetalburgCity_Gym_Text_GymGuideAdvice2, MSGBOX_DEFAULT
 	release

@@ -309,6 +309,7 @@ MossdeepCity_Gym_EventScript_GymGuide::
 	giveitem ITEM_REVIVAL_HERB, 10
 	setflag FLAG_MOSSDEEP_GYM_REVIVAL_HERBS
 	msgbox MossdeepCity_Gym_Text_Guide2, MSGBOX_DEFAULT
+	callnative SyncSoftLevelCap
 	release
 	end
 

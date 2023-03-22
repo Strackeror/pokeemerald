@@ -317,6 +317,7 @@ DewfordTown_Gym_EventScript_GymGuide::
 	giveitem ITEM_FRESH_WATER, 10
 	setflag FLAG_DEWFORD_GYM_FRESHWATER
 	msgbox DewfordTown_Gym_Text_Guide2, MSGBOX_DEFAULT
+	callnative SyncSoftLevelCap
 	release
 	end
 

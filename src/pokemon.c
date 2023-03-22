@@ -8230,6 +8230,18 @@ void StepSoftLevelCap()
     }
 }
 
+void SyncSoftLevelCap() {
+    u8 levelCapSetting = gSaveBlock2Ptr->levelCaps;
+
+    // Little workaround so you don't immediately get to level 100
+    if (levelCapSetting == LEVEL_CAPS_DEFAULT) {
+        gSaveBlock2Ptr->levelCaps = LEVEL_CAPS_MORE;
+    }
+
+    gSaveBlock1Ptr->softLevelCap  = GetLevelCap();
+    gSaveBlock2Ptr->levelCaps = levelCapSetting;
+}
+
 u8 GetSoftLevelCap()
 {
     return gSaveBlock1Ptr->softLevelCap;

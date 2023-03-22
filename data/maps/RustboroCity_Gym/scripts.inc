@@ -207,6 +207,7 @@ Rustboro_Gym_Guide_Trigger4::
 
 Rustboro_Gym_Guide_Speech::
 	msgbox RustboroCity_Gym_Text_Tips, MSGBOX_DEFAULT
+	callnative SyncSoftLevelCap
 	giveitem ITEM_FRESH_WATER, 5
 	setvar VAR_RUSTBORO_CITY_STATE, 1
 	compare VAR_TEMP_1, 1

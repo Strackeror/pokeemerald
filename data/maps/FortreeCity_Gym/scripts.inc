@@ -154,6 +154,7 @@ FortreeCity_Gym_EventScript_GymGuide:: @ 8216732
 	giveitem ITEM_ENERGY_ROOT, 10
 	setflag FLAG_MOVE_FORTREE_GYM_ENERGY_ROOT
 	msgbox FortreeCity_Gym_Text_GymGuideAdvice2, MSGBOX_DEFAULT
+	callnative SyncSoftLevelCap
 	release
 	end
 

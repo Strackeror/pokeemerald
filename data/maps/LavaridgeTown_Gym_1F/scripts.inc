@@ -221,6 +221,7 @@ LavaridgeTown_Gym_1F_EventScript_GymGuide:: @ 81FE96C
 	msgbox LavaridgeTown_Gym_1F_Text_GymGuideAdvice1, MSGBOX_DEFAULT
 	giveitem ITEM_ENERGY_ROOT, 15
 	setflag FLAG_LAVARIDGE_GYM_ENERGY_ROOTS
+	callnative SyncSoftLevelCap
 	msgbox LavaridgeTown_Gym_1F_Text_GymGuideAdvice2, MSGBOX_DEFAULT
 	release
 	end

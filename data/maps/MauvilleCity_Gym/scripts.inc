@@ -291,6 +291,7 @@ MauvilleCity_Gym_EventScript_GymGuide::
 	msgbox MauvilleCity_Gym_Text_GymGuideAdvice, MSGBOX_DEFAULT
 	giveitem ITEM_MOOMOO_MILK, 12
 	setflag FLAG_MAUVILLE_GYM_MOOMOOMILK
+	callnative SyncSoftLevelCap
 	msgbox MauvilleCity_Gym_Text_GymGuideAdvice2, MSGBOX_DEFAULT
 	release
 	end
