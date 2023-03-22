@@ -3889,6 +3889,9 @@ static void Cmd_getexp(void)
 
         if (isTrainerBattle) {
             StepSoftLevelCap();
+            if (IsDoubleBattle()) {
+                StepSoftLevelCap();
+            }
         }
 
         // Print Exp gain message once, only after KO, and only if something can gain Exp
