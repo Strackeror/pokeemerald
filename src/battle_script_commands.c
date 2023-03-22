@@ -3976,7 +3976,7 @@ static void Cmd_getexp(void)
                 if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP) && !GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_IS_EGG))
                 {
                     u8 growthRate = gBaseStats[GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPECIES, NULL)].growthRate;
-                    u32 targetExperience = gExperienceTables[growthRate][GetSoftLevelCap()];
+                    u32 targetExperience = gExperienceTables[growthRate][GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL, NULL) + 1];
                     u32 currentExperience = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_EXP);
                     gBattleMoveDamage = targetExperience - currentExperience;
 
