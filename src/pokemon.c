@@ -8221,6 +8221,20 @@ u8 GetLevelCap(void)
     return currentLevelCap;
 }
 
+
+void StepSoftLevelCap()
+{
+    u8 cap = gSaveBlock1Ptr->softLevelCap;
+    if (cap < GetLevelCap()) {
+        gSaveBlock1Ptr->softLevelCap += 1;
+    }
+}
+
+u8 GetSoftLevelCap()
+{
+    return gSaveBlock1Ptr->softLevelCap;
+}
+
 static void ShuffleStatArray(u8* statArray)
 {
     int i;

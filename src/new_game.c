@@ -207,6 +207,7 @@ void NewGameInitData(void)
     ResetTrainerHillResults();
     ResetContestLinkResults();
     RandomizeBerryEncounters();
+    gSaveBlock1Ptr->softLevelCap = 6;
 }
 
 static void ResetMiniGamesRecords(void)
