@@ -125,6 +125,7 @@ static void PrintIdOnCard(void);
 static void PrintMoneyOnCard(void);
 static void PrintPokedexOnCard(void);
 static void PrintProfilePhraseOnCard(void);
+static void PrintLevelCapOnCard(void);
 static bool8 PrintAllOnCardBack(void);
 static void PrintNameOnCardBack(void);
 static void PrintHofDebutTimeOnCard(void);
@@ -933,6 +934,9 @@ static bool8 PrintAllOnCardFront(void)
     case 5:
         PrintProfilePhraseOnCard();
         break;
+    case 6:
+        PrintLevelCapOnCard();
+        break;
     default:
         sData->printState = 0;
         return TRUE;
@@ -1026,6 +1030,18 @@ static void PrintIdOnCard(void)
     }
 
     AddTextPrinterParameterized3(1, 1, xPos, top, sTrainerCardTextColors, TEXT_SPEED_FF, buffer);
+}
+
+const u8 gTextLevelCap[] = _("Level:");
+static void PrintLevelCapOnCard(void){
+    u8 buffer[32];
+    u8* txtPtr;
+    s32 xPos;
+    txtPtr = StringCopy(buffer, gTextLevelCap);
+    ConvertIntToDecimalStringN(txtPtr, GetSoftLevelCap(), STR_CONV_MODE_LEFT_ALIGN, 6);
+
+    xPos = GetStringCenterAlignXOffset(1, buffer, 80) + 120;
+    AddTextPrinterParameterized3(1, 1, xPos, 20, sTrainerCardTextColors, TEXT_SPEED_FF, buffer);
 }
 
 static void PrintMoneyOnCard(void)
