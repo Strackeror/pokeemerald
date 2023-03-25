@@ -256,10 +256,16 @@ static u8 GetShowPokemon()
     return GetBattlerPosition(B_POSITION_OPPONENT_LEFT);
 }
 
+enum Speed {
+    TIE,
+    FIRST,
+    SECOND,
+};
+
 struct PotentialDamage {
     u16 min;
     u16 max;
-    u16 crit;
+    enum Speed speed;
 };
 
 struct PotentialDamage CalcPotentialDamage(u16 move) {
@@ -270,12 +276,24 @@ struct PotentialDamage CalcPotentialDamage(u16 move) {
     u32 dmg = CalculateMoveDamage(move, gActiveBattler, targetId, moveType, 0, FALSE, FALSE, FALSE);
     struct Pokemon* target = &gEnemyParty[gBattlerPartyIndexes[targetId]];
 
+    u32 atkSpeed = GetBattlerTotalSpeedStat(gActiveBattler);
+    u32 defSpeed = GetBattlerTotalSpeedStat(targetId);
+    enum Speed speed;
+
+    if (atkSpeed > defSpeed)
+        speed = FIRST;
+    else if (atkSpeed < defSpeed)
+        speed = SECOND;
+    else
+        speed = TIE;
+
     u32 minDmg = dmg * 86 / 100;
 
     u32 percentage = dmg * 1000 / target->maxHP;
     struct PotentialDamage ret = {
         .min = minDmg * 1000 / target->maxHP,
         .max = dmg * 1000 / target->maxHP,
+        .speed = speed,
     };
     return ret;
 }
@@ -297,8 +315,11 @@ static const u8 sText_Power[] = _("Pow:");
 static const u8 sText_Accuracy[] = _(" Ac:");
 static const u8 sText_ThreeDashes[] = _("---");
 
-static const u8 sText_FormatPercent[] = _("{STR_VAR_1}.{STR_VAR_2}%");
-static const u8 sText_FormatRange[] = _("{STR_VAR_1}-{STR_VAR_2}");
+static const u8 sText_1st[] = _("1st");
+static const u8 sText_2nd[] = _("2nd");
+static const u8 sText_Eq[] = _(" Eq");
+static const u8 sText_FormatCalc[] = _("{STR_VAR_1} {STR_VAR_2}%-{STR_VAR_3}%");
+
 
 void MoveSelectionDisplayMoveData(void)
 {
@@ -327,22 +348,29 @@ void MoveSelectionDisplayMoveData(void)
 
 
     // Damage Calcs
-    if (gBattleMoves[move].split != SPLIT_STATUS) {
-        struct PotentialDamage dmg = CalcPotentialDamage(move);
-        ConvertIntToDecimalStringN(gStringVar1, dmg.min / 10, STR_CONV_MODE_RIGHT_ALIGN, 3);
-        ConvertIntToDecimalStringN(gStringVar2, dmg.min % 10, STR_CONV_MODE_RIGHT_ALIGN, 1);
-        StringExpandPlaceholders(gStringVar3, sText_FormatPercent);
-        ConvertIntToDecimalStringN(gStringVar1, dmg.max / 10, STR_CONV_MODE_RIGHT_ALIGN, 3);
-        ConvertIntToDecimalStringN(gStringVar2, dmg.max % 10, STR_CONV_MODE_RIGHT_ALIGN, 1);
-        StringExpandPlaceholders(gStringVar4, sText_FormatPercent);
-        StringCopy(gStringVar1, gStringVar3);
-        StringCopy(gStringVar2, gStringVar4);
-        StringExpandPlaceholders(gDisplayedStringBattle, sText_FormatRange);
-        BattlePutTextOnWindow(gDisplayedStringBattle, 10);
-    } else {
-        BattlePutTextOnWindow(sText_ThreeDashes, 10);
+    struct PotentialDamage dmg = CalcPotentialDamage(move);
+    switch (dmg.speed) {
+        case TIE:
+            StringCopy(gStringVar1, sText_Eq);
+            break;
+        case FIRST:
+            StringCopy(gStringVar1, sText_1st);
+            break;
+        case SECOND:
+            StringCopy(gStringVar1, sText_2nd);
+            break;
     }
-
+    if (gBattleMoves[move].split != SPLIT_STATUS)
+    {
+            ConvertIntToDecimalStringN(gStringVar2, dmg.min / 10, STR_CONV_MODE_RIGHT_ALIGN, 3);
+            ConvertIntToDecimalStringN(gStringVar3, dmg.max / 10, STR_CONV_MODE_RIGHT_ALIGN, 3);
+            StringExpandPlaceholders(gDisplayedStringBattle, sText_FormatCalc);
+            BattlePutTextOnWindow(gDisplayedStringBattle, 10);
+    }
+    else
+    {
+            BattlePutTextOnWindow(gStringVar1, 10);
+    }
 
     // Description
     if (!sBattleMenuState.active) {
