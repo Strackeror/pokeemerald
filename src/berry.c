@@ -1485,15 +1485,19 @@ bool32 ObjectEventInteractionWaterBerryTree(void)
     {
     case BERRY_STAGE_PLANTED:
         tree->watered1 = TRUE;
+        BerryTreeGrow(tree);
         break;
     case BERRY_STAGE_SPROUTED:
         tree->watered2 = TRUE;
+        BerryTreeGrow(tree);
         break;
     case BERRY_STAGE_TALLER:
         tree->watered3 = TRUE;
+        BerryTreeGrow(tree);
         break;
     case BERRY_STAGE_FLOWERING:
         tree->watered4 = TRUE;
+        BerryTreeGrow(tree);
         break;
     default:
         return FALSE;
