@@ -282,7 +282,6 @@ void TypeInfoDestroySprites()
     sTypeSprite.doubleActive = FALSE;
     DestroyTypeIconSprite();
     DestroyMoveSplitSprite();
-    ShowMoveTypeEffect();
 }
 
 void TypeInfoUpdateDouble(bool8 active) {

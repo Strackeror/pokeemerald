@@ -1,14 +1,22 @@
 #include "global.h"
 #include "gba/defines.h"
 #include "gba/io_reg.h"
+#include "battle.h"
+#include "battle_ai_util.h"
 #include "battle_anim.h"
 #include "battle_controllers.h"
+#include "battle_interface.h"
+#include "battle_main.h"
 #include "battle_message.h"
+#include "battle_util.h"
+#include "constants/battle.h"
+#include "constants/pokemon.h"
 #include "data.h"
 #include "decompress.h"
 #include "graphics.h"
 #include "menu.h"
 #include "palette.h"
+#include "pokemon.h"
 #include "pokemon_summary_screen.h"
 #include "sprite.h"
 #include "string_util.h"
@@ -19,6 +27,7 @@
 EWRAM_DATA struct {
     bool8 loaded: 1;
     bool8 active: 1;
+    u8 selectedDoubleMon: 1;
     u8 buttonPromptSprites[2];
     u8 window;
 } sBattleMenuState;
@@ -237,6 +246,40 @@ void TryRestoreBattleInfoSystem_ButtonPrompt(void)
     }
 }
 
+
+static u8 GetShowPokemon()
+{
+    if (!IsDoubleBattle()) 
+        return GetBattlerPosition(B_POSITION_OPPONENT_LEFT);
+    if (sBattleMenuState.selectedDoubleMon) 
+        return GetBattlerPosition(B_POSITION_OPPONENT_RIGHT);
+    return GetBattlerPosition(B_POSITION_OPPONENT_LEFT);
+}
+
+struct PotentialDamage {
+    u16 min;
+    u16 max;
+    u16 crit;
+};
+
+struct PotentialDamage CalcPotentialDamage(u16 move) {
+    u8 targetId = GetShowPokemon();
+    u8 moveType;
+    GET_MOVE_TYPE(move, moveType);
+
+    u32 dmg = CalculateMoveDamage(move, gActiveBattler, targetId, moveType, 0, FALSE, FALSE, FALSE);
+    struct Pokemon* target = &gEnemyParty[gBattlerPartyIndexes[targetId]];
+
+    u32 minDmg = dmg * 86 / 100;
+
+    u32 percentage = dmg * 1000 / target->maxHP;
+    struct PotentialDamage ret = {
+        .min = minDmg * 1000 / target->maxHP,
+        .max = dmg * 1000 / target->maxHP,
+    };
+    return ret;
+}
+
 #define MOVE_DESCRIPTION_WINDOW_ID = 24;
 
 static const struct WindowTemplate sDescriptionWindowTemplate = {
@@ -253,6 +296,10 @@ static const struct WindowTemplate sDescriptionWindowTemplate = {
 static const u8 sText_Power[] = _("Pow:");
 static const u8 sText_Accuracy[] = _(" Ac:");
 static const u8 sText_ThreeDashes[] = _("---");
+
+static const u8 sText_FormatPercent[] = _("{STR_VAR_1}.{STR_VAR_2}%");
+static const u8 sText_FormatRange[] = _("{STR_VAR_1}-{STR_VAR_2}");
+
 void MoveSelectionDisplayMoveData(void)
 {
     struct ChooseMoveStruct *moveInfo =
@@ -277,6 +324,25 @@ void MoveSelectionDisplayMoveData(void)
     else
         StringCopy(txtPtr, sText_ThreeDashes);
     BattlePutTextOnWindow(gDisplayedStringBattle, 9);
+
+
+    // Damage Calcs
+    if (gBattleMoves[move].split != SPLIT_STATUS) {
+        struct PotentialDamage dmg = CalcPotentialDamage(move);
+        ConvertIntToDecimalStringN(gStringVar1, dmg.min / 10, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar2, dmg.min % 10, STR_CONV_MODE_RIGHT_ALIGN, 1);
+        StringExpandPlaceholders(gStringVar3, sText_FormatPercent);
+        ConvertIntToDecimalStringN(gStringVar1, dmg.max / 10, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar2, dmg.max % 10, STR_CONV_MODE_RIGHT_ALIGN, 1);
+        StringExpandPlaceholders(gStringVar4, sText_FormatPercent);
+        StringCopy(gStringVar1, gStringVar3);
+        StringCopy(gStringVar2, gStringVar4);
+        StringExpandPlaceholders(gDisplayedStringBattle, sText_FormatRange);
+        BattlePutTextOnWindow(gDisplayedStringBattle, 10);
+    } else {
+        BattlePutTextOnWindow(sText_ThreeDashes, 10);
+    }
+
 
     // Description
     if (!sBattleMenuState.active) {
@@ -310,6 +376,7 @@ enum
     REFRESH,
 };
 
+
 u8 HandleInputMoveInfo()
 {
     if (sBattleMenuState.active)
@@ -319,7 +386,16 @@ u8 HandleInputMoveInfo()
             sBattleMenuState.active = FALSE;
             TryRestoreBattleInfoSystem_ButtonPrompt();
             RemoveWindow(sBattleMenuState.window);
+            if (IsDoubleBattle()) 
+                gSprites[gBattlerSpriteIds[GetShowPokemon()]].callback = SpriteCb_HideAsMoveTarget;
             return REFRESH;
+        }
+        if (IsDoubleBattle() && JOY_NEW(DPAD_LEFT | DPAD_RIGHT))
+        {
+            gSprites[gBattlerSpriteIds[GetShowPokemon()]].callback = SpriteCb_HideAsMoveTarget;
+            sBattleMenuState.selectedDoubleMon = !sBattleMenuState.selectedDoubleMon;
+            gSprites[gBattlerSpriteIds[GetShowPokemon()]].callback = SpriteCb_ShowAsMoveTarget;
+            MoveSelectionDisplayMoveData();
         }
     }
     else
@@ -330,6 +406,9 @@ u8 HandleInputMoveInfo()
             MoveSelectionDisplayMoveData();
             TryHideBattleInfoSystem_ButtonPrompt();
             sBattleMenuState.active = TRUE;
+            TypeInfoDestroySprites();
+            if (IsDoubleBattle())
+                gSprites[gBattlerSpriteIds[GetShowPokemon()]].callback = SpriteCb_ShowAsMoveTarget;
         }
         if (JOY_NEW(A_BUTTON | B_BUTTON))
         {
