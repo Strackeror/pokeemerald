@@ -18,7 +18,13 @@ It adds a bunch of Qol/Streamlining Features:
   - When capturing a new pokémon, focus it the next time you open the pokédex
   - When applicable, show the necessary badge's icon for tutor moves in dex
   - Show enemy trainer party in trainer battles
-  - Show more information about moves in battle interface
+  - Improved battle UI
+    - Type, Category and Effectiveness Icons
+    - L+A for more info:
+      - Description
+      - Power/Accuracy
+      - Basic damage calcs
+      - Speed comparison
 
 # Code notes
 
