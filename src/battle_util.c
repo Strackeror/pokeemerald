@@ -9828,30 +9828,31 @@ void SortBattlersBySpeed(u8 *battlers, bool8 slowToFast)
 void TryRestoreItems(void)
 {
     u32 i;
-    u16 stolenItem = ITEM_NONE;
-    
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        stolenItem = gBattleStruct->itemStolen[i].originalItem;
+        u16 stolenItem = gBattleStruct->itemStolen[i].originalItem;
+        bool8 stolen = gBattleStruct->itemStolen[i].stolen;
+
         // Skip poke if it didn't start with an item
         if (stolenItem == ITEM_NONE)
             continue;
 
-        // Skip poke if it still has an item and nothing has been stolen
-        if (GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) != ITEM_NONE &&
-            !gBattleStruct->itemStolen[i].stolen)
-            continue;
-
-        // Restore berry, if we have one in the bag
-        if (ItemId_GetPocket(stolenItem) == POCKET_BERRIES)
+        // Restore item directly if it's been stolen by a trainer and it's not a berry
+        if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
         {
-            if (RemoveBagItem(stolenItem, 1)) 
+            if (stolen && ItemId_GetPocket(stolenItem) != POCKET_BERRIES)
+            {
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &stolenItem);
-            continue;
+                continue;
+            }
         }
 
-        // Restore other items
-        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &stolenItem);
+        // Otherwise try to take one from bag if the poke is not holding anything
+        if (GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE &&
+            RemoveBagItem(stolenItem, 1))
+        {
+            SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &stolenItem);
+        }
     }
 }
 

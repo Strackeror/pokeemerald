@@ -9,7 +9,7 @@ It adds a bunch of Qol/Streamlining Features:
   - Faster Black Transitions
   - Faster HP Bars
   - 'Move Pokémon' as first option on PC
-  - Restore Held Items at end of combat, taking one from bag if it was a berry
+  - Restore held items from bag at end of battle
   - When on a bike, swap bike type with R-Button
   - Show item icon when picking up an item, and its decription if it is the first time you pick it up
   - Register key items to a menu on L-Button
