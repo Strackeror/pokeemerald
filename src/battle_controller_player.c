@@ -11,6 +11,7 @@
 #include "battle_tv.h"
 #include "bg.h"
 #include "constants/battle.h"
+#include "constants/global.h"
 #include "data.h"
 #include "item.h"
 #include "item_menu.h"
@@ -244,6 +245,17 @@ static void CompleteShowEnemyParty() {
     }
 }
 
+static void OpenEnemyParty(void)
+{
+    gBattlerControllerFuncs[gActiveBattler] = CompleteShowEnemyParty;
+    FreeAllWindowBuffers();
+    ShowPokemonSummaryScreen(SUMMARY_MODE_LOCK_MOVES,
+        gEnemyParty,
+        gBattlerPartyIndexes[1],
+        PARTY_SIZE - 1,
+        CB2_SetUpReshowBattleScreenAfterMenu);
+}
+
 static void HandleInputChooseAction(void)
 {
     u16 itemId = gBattleResources->bufferA[gActiveBattler][2] | (gBattleResources->bufferA[gActiveBattler][3] << 8);
@@ -358,14 +370,7 @@ static void HandleInputChooseAction(void)
         } else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER) {
             PlaySE(SE_SELECT);
             TryHideLastUsedBall();
-            ReshowBattleScreenDummy();
-            FreeAllWindowBuffers();
-            ShowPokemonSummaryScreen(SUMMARY_MODE_LOCK_MOVES,
-                gEnemyParty,
-                gBattlerPartyIndexes[1],
-                CalculateEnemyPartyCount() - 1,
-                CB2_SetUpReshowBattleScreenAfterMenu);
-            gBattlerControllerFuncs[gActiveBattler] = CompleteShowEnemyParty;
+            OpenEnemyParty();
         }
     }
     #endif
@@ -2888,26 +2893,6 @@ static void PlayerHandleChooseItem(void)
 
     for (i = 0; i < ARRAY_COUNT(gBattlePartyCurrentOrder); i++)
         gBattlePartyCurrentOrder[i] = gBattleResources->bufferA[gActiveBattler][1 + i];
-}
-
-static void OpenEnemyParty(void)
-{
-    if (!gPaletteFade.active)
-    {
-        gBattlerControllerFuncs[gActiveBattler] = CompleteWhenChoseItem;
-        ReshowBattleScreenDummy();
-        FreeAllWindowBuffers();
-        ShowPokemonSummaryScreen(SUMMARY_MODE_LOCK_MOVES,
-            gEnemyParty,
-            gBattlerPartyIndexes[1],
-            CalculateEnemyPartyCount() - 1,
-            CB2_SetUpReshowBattleScreenAfterMenu);
-    }
-}
-static void PlayerHandleShowEnemyParty(void) {
-    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
-    gBattlerControllerFuncs[gActiveBattler] = OpenBagAndChooseItem;
-    gBattlerInMenuId = gActiveBattler;
 }
 
 static void PlayerHandleChoosePokemon(void)
