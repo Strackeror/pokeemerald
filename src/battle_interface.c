@@ -3299,6 +3299,8 @@ bool32 CanThrowLastUsedBall(void)
 
 void TryAddLastUsedBallItemSprites(void)
 {
+    bool8 canThrowBall, isTrainer;
+
     #if B_LAST_USED_BALL == TRUE
     if (gLastThrownBall == 0
       || (gLastThrownBall != 0 && !CheckBagHasItem(gLastThrownBall, 1)))
@@ -3309,8 +3311,8 @@ void TryAddLastUsedBallItemSprites(void)
         gLastThrownBall = gBagPockets[BALLS_POCKET].itemSlots[0].itemId;
     }
 
-    bool8 canThrowBall = CanThrowBall() == 0 && CheckBagHasItem(gLastThrownBall, 1);
-    bool8 isTrainer = (gBattleTypeFlags & BATTLE_TYPE_TRAINER) != 0;
+    canThrowBall = CanThrowBall() == 0 && CheckBagHasItem(gLastThrownBall, 1);
+    isTrainer = (gBattleTypeFlags & BATTLE_TYPE_TRAINER) != 0;
     if (!canThrowBall && !isTrainer) {
         return;
     }
@@ -3318,7 +3320,7 @@ void TryAddLastUsedBallItemSprites(void)
     // ball
     if (gBattleStruct->ballSpriteIds[0] == MAX_SPRITES)
     {
-        u16 itemId = canThrowBall ? gLastThrownBall : ITEM_SCANNER;
+        u16 itemId = isTrainer ? ITEM_SCANNER : gLastThrownBall;
         gBattleStruct->ballSpriteIds[0] = AddItemIconSprite(102, 102, itemId);
         gSprites[gBattleStruct->ballSpriteIds[0]].x = LAST_USED_BALL_X_0;
         gSprites[gBattleStruct->ballSpriteIds[0]].y = LAST_USED_BALL_Y;
