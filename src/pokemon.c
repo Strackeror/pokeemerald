@@ -7655,57 +7655,32 @@ void SetWildMonHeldItem(void)
         return;
 
     count = (WILD_DOUBLE_BATTLE) ? 2 : 1;
-    if (!GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG, 0)
-        && (GetMonAbility(&gPlayerParty[0]) == ABILITY_COMPOUND_EYES
-            || GetMonAbility(&gPlayerParty[0]) == ABILITY_SUPER_LUCK))
-    {
-        var1 = 20;
-        var2 = 80;
-    }
-    else
-    {
-        var1 = 45;
-        var2 = 95;
-    }
+    var1 = 0;
+    var2 = 50;
 
     for (i = 0; i < count; i++)
     {
-        rnd = Random() % 100;
+        rnd = Random() % 2;
         species = GetMonData(&gEnemyParty[i], MON_DATA_SPECIES, 0);
         if (gMapHeader.mapLayoutId == LAYOUT_ALTERING_CAVE)
         {
             s32 alteringCaveId = GetWildMonTableIdInAlteringCave(species);
             if (alteringCaveId != 0)
             {
-                if (rnd < var2)
-                    continue;
                 SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, &sAlteringCaveWildMonHeldItems[alteringCaveId].item);
-            }
-            else
-            {
-                if (rnd < var1)
-                    continue;
-                if (rnd < var2)
-                    SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, &gBaseStats[species].item1);
-                else
-                    SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, &gBaseStats[species].item2);
+                continue;
             }
         }
         else
         {
-            if (gBaseStats[species].item1 == gBaseStats[species].item2 && gBaseStats[species].item1 != 0)
-            {
-                SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, &gBaseStats[species].item1);
-            }
-            else
-            {
-                if (rnd < var1)
-                    continue;
-                if (rnd < var2)
-                    SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, &gBaseStats[species].item1);
-                else
-                    SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, &gBaseStats[species].item2);
-            }
+            u16 item1 = gBaseStats[species].item1;
+            u16 item2 = gBaseStats[species].item2;
+
+            if (item1 && !item2)
+                item2 = item1;
+            if (item2 && !item1) 
+                item1 = item2;
+            SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, rnd ? &item1: &item2);
         }
     }
 }
