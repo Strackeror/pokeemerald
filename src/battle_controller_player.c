@@ -10,6 +10,7 @@
 #include "battle_setup.h"
 #include "battle_tv.h"
 #include "bg.h"
+#include "constants/battle.h"
 #include "data.h"
 #include "item.h"
 #include "item_menu.h"
@@ -20,6 +21,7 @@
 #include "party_menu.h"
 #include "pokeball.h"
 #include "pokemon.h"
+#include "pokemon_summary_screen.h"
 #include "random.h"
 #include "recorded_battle.h"
 #include "reshow_battle_screen.h"
@@ -235,6 +237,13 @@ static void CompleteOnBankSpritePosX_0(void)
         PlayerBufferExecCompleted();
 }
 
+static void CompleteShowEnemyParty() {
+    if (gMain.callback2 == BattleMainCB2)
+    {
+        PlayerHandleChooseAction();
+    }
+}
+
 static void HandleInputChooseAction(void)
 {
     u16 itemId = gBattleResources->bufferA[gActiveBattler][2] | (gBattleResources->bufferA[gActiveBattler][3] << 8);
@@ -339,12 +348,25 @@ static void HandleInputChooseAction(void)
         PlayerBufferExecCompleted();
     }
     #if B_LAST_USED_BALL == TRUE
-    else if (JOY_NEW(B_LAST_USED_BALL_BUTTON) && CanThrowLastUsedBall())
+    else if (JOY_NEW(B_LAST_USED_BALL_BUTTON))
     {
-        PlaySE(SE_SELECT);
-        TryHideLastUsedBall();
-        BtlController_EmitTwoReturnValues(1, B_ACTION_THROW_BALL, 0);
-        PlayerBufferExecCompleted();
+        if (CanThrowLastUsedBall()) {
+            PlaySE(SE_SELECT);
+            TryHideLastUsedBall();
+            BtlController_EmitTwoReturnValues(1, B_ACTION_THROW_BALL, 0);
+            PlayerBufferExecCompleted();
+        } else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER) {
+            PlaySE(SE_SELECT);
+            TryHideLastUsedBall();
+            ReshowBattleScreenDummy();
+            FreeAllWindowBuffers();
+            ShowPokemonSummaryScreen(SUMMARY_MODE_LOCK_MOVES,
+                gEnemyParty,
+                gBattlerPartyIndexes[1],
+                CalculateEnemyPartyCount() - 1,
+                CB2_SetUpReshowBattleScreenAfterMenu);
+            gBattlerControllerFuncs[gActiveBattler] = CompleteShowEnemyParty;
+        }
     }
     #endif
 }
@@ -2866,6 +2888,26 @@ static void PlayerHandleChooseItem(void)
 
     for (i = 0; i < ARRAY_COUNT(gBattlePartyCurrentOrder); i++)
         gBattlePartyCurrentOrder[i] = gBattleResources->bufferA[gActiveBattler][1 + i];
+}
+
+static void OpenEnemyParty(void)
+{
+    if (!gPaletteFade.active)
+    {
+        gBattlerControllerFuncs[gActiveBattler] = CompleteWhenChoseItem;
+        ReshowBattleScreenDummy();
+        FreeAllWindowBuffers();
+        ShowPokemonSummaryScreen(SUMMARY_MODE_LOCK_MOVES,
+            gEnemyParty,
+            gBattlerPartyIndexes[1],
+            CalculateEnemyPartyCount() - 1,
+            CB2_SetUpReshowBattleScreenAfterMenu);
+    }
+}
+static void PlayerHandleShowEnemyParty(void) {
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+    gBattlerControllerFuncs[gActiveBattler] = OpenBagAndChooseItem;
+    gBattlerInMenuId = gActiveBattler;
 }
 
 static void PlayerHandleChoosePokemon(void)
