@@ -3309,7 +3309,7 @@ void TryAddLastUsedBallItemSprites(void)
         gLastThrownBall = gBagPockets[BALLS_POCKET].itemSlots[0].itemId;
     }
 
-    bool8 canThrowBall = CanThrowBall() && CheckBagHasItem(gLastThrownBall, 1);
+    bool8 canThrowBall = CanThrowBall() == 0 && CheckBagHasItem(gLastThrownBall, 1);
     bool8 isTrainer = (gBattleTypeFlags & BATTLE_TYPE_TRAINER) != 0;
     if (!canThrowBall && !isTrainer) {
         return;
